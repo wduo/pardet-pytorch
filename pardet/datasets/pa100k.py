@@ -11,7 +11,7 @@ from .builder import DATASETS
 
 @DATASETS.register_module()
 class PA100K(data.Dataset):
-    def __init__(self, split, ann_file, pipeline=None, target_transform=None):
+    def __init__(self, split, ann_file, img_prefix, pipeline=None, target_transform=None):
         dataset_info = pickle.load(open(ann_file, 'rb+'))
         img_id = dataset_info.image_name
         attr_label = dataset_info.label

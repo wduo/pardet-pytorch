@@ -8,6 +8,7 @@ from pardet.utils import Registry, build_from_cfg
 BOCKBONES = Registry('BACKBONES')
 CLASSIFIERS = Registry('CLASSIFIERS')
 PARNETS = Registry('PARNETS')
+LOSSES = Registry('LOSSES')
 
 
 def build_bockbone(cfg):
@@ -23,6 +24,11 @@ def build_classifier(cfg):
 def build_parnet(cfg, train_cfg=None, test_cfg=None):
     """Build detector."""
     return build(cfg, PARNETS)
+
+
+def build_loss(cfg):
+    """Build detector."""
+    return build(cfg, LOSSES)
 
 
 def build(cfg, registry, default_args=None):

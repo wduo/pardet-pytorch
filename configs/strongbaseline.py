@@ -20,10 +20,10 @@ test_cfg = dict(
 
 # data
 dataset_type = 'PA100K'
-data_root = ''
+data_root = '/opt/project/data/PA100K/'
 img_norm_cfg = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 train_pipeline = [
-    dict(type='Resize', size=(256, 192), keep_ratio=True),
+    dict(type='Resize', size=(256, 192)),
     dict(type='Pad', padding=10),
     dict(type='RandomCrop', size=(256, 192)),
     dict(type='RandomHorizontalFlip', p=0.5),
@@ -39,8 +39,8 @@ data = dict(
     train=dict(
         type=dataset_type,
         split='train',
-        ann_file=data_root + 'annotations/instances_train2017.json',
-        img_prefix=data_root + 'train2017/',
+        ann_file=data_root + 'annotation/dataset.pkl',
+        img_prefix=data_root + 'data/release_data/',
         pipeline=train_pipeline
     ),
     val=dict(

@@ -12,6 +12,8 @@ from pardet.datasets import build_dataset
 from pardet.utils import Config, DictAction
 from pardet.utils import mkdir_or_exist, get_root_logger, collect_env
 
+from pardet.apis import set_random_seed, train_detector
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
@@ -97,6 +99,15 @@ def main():
 
     # dataset
     datasets = [build_dataset(cfg.data.train)]
+
+    train_detector(
+        model,
+        datasets,
+        cfg,
+        distributed=distributed,
+        validate=(not args.no_validate),
+        timestamp=timestamp,
+        meta=meta)
 
     #
     img_path = '/opt/project/tests/data/0.2.jpg'

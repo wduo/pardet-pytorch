@@ -5,11 +5,23 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from tools.function import ratio2weight
+from ..builder import LOSSES
 
 
+def ratio2weight(targets, ratio):
+    ratio = torch.from_numpy(ratio).type_as(targets)
+    pos_weights = targets * (1 - ratio)
+    neg_weights = (1 - targets) * ratio
+    weights = torch.exp(neg_weights + pos_weights)
+
+    # for RAP dataloader, targets element may be 2, with or without smooth, some element must great than 1
+    weights[targets > 1] = 0.0
+
+    return weights
+
+
+@LOSSES.register_module()
 class CEL_Sigmoid(nn.Module):
-
     def __init__(self, sample_weight=None, size_average=True):
         super(CEL_Sigmoid, self).__init__()
 

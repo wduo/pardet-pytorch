@@ -36,7 +36,8 @@ def generate_data_description(save_dir, reorder):
     test_image_name = [pa100k_data['test_images_name'][i][0][0] for i in range(10000)]
     dataset.image_name = train_image_name + val_image_name + test_image_name
 
-    dataset.label = np.concatenate((pa100k_data['train_label'], pa100k_data['val_label'], pa100k_data['test_label']), axis=0)
+    dataset.label = np.concatenate((pa100k_data['train_label'], pa100k_data['val_label'], pa100k_data['test_label']),
+                                   axis=0)
     assert dataset.label.shape == (100000, 26)
     dataset.attr_name = [pa100k_data['attributes'][i][0][0] for i in range(26)]
 
@@ -58,8 +59,6 @@ def generate_data_description(save_dir, reorder):
 
 
 if __name__ == "__main__":
-
-    # save_dir = './data/PA100k/'
-    save_dir = '/home/wd/assets/mounts/123_wd/data_disk/PA100K/annotation/'
+    save_dir = '/opt/project/data/PA100K/annotation/'
     reoder = True
     generate_data_description(save_dir, reorder=True)

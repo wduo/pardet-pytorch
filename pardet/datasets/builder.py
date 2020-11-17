@@ -1,4 +1,5 @@
 from torch import nn
+from torch.utils.data import DataLoader
 
 from pardet.utils import Registry, build_from_cfg
 
@@ -6,9 +7,25 @@ DATASETS = Registry('DATASETS')
 PIPELINES = Registry('PIPELINES')
 
 
-def build_dataset(cfg, train_cfg=None, test_cfg=None):
+def build_dataset(cfg):
     """Build detector."""
-    return build(cfg, DATASETS, dict(train_cfg=train_cfg, test_cfg=test_cfg))
+    return build(cfg, DATASETS)
+
+
+def build_pipeline(cfg):
+    """Build detector."""
+    return build(cfg, PIPELINES)
+
+
+def build_dataloader(train_set, batchsize, shuffle=True):
+    data_loader = DataLoader(
+        dataset=train_set,
+        batch_size=batchsize,
+        shuffle=shuffle,
+        num_workers=8,
+        pin_memory=True,
+    )
+    return data_loader
 
 
 def build(cfg, registry, default_args=None):
