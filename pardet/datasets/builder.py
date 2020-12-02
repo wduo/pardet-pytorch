@@ -17,12 +17,12 @@ def build_pipeline(cfg):
     return build(cfg, PIPELINES)
 
 
-def build_dataloader(train_set, batchsize, shuffle=True):
+def build_dataloader(train_set, batchsize, workers, shuffle=True):
     data_loader = DataLoader(
         dataset=train_set,
         batch_size=batchsize,
+        num_workers=workers,
         shuffle=shuffle,
-        num_workers=8,
         pin_memory=True,
     )
     return data_loader

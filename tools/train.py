@@ -1,11 +1,6 @@
-import os
 import time
 import argparse
-import numpy as np
 import os.path as osp
-from PIL import Image
-
-import torch
 
 from pardet.models import build_parnet
 from pardet.datasets import build_dataset
@@ -17,32 +12,19 @@ from pardet.apis import set_random_seed, train_detector
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--config', help='train config file path',
-                        default='../configs/strongbaseline.py')
+    parser.add_argument('--config', help='train config file path', default='../configs/strongbaseline.py')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
+    parser.add_argument('--no-validate', action='store_true',
+                        help='whether not to evaluate the checkpoint during training')
     group_gpus = parser.add_mutually_exclusive_group()
-    group_gpus.add_argument(
-        '--gpus',
-        type=int,
-        help='number of gpus to use '
-             '(only applicable to non-distributed training)')
-    group_gpus.add_argument(
-        '--gpu-ids',
-        type=int,
-        nargs='+',
-        help='ids of gpus to use '
-             '(only applicable to non-distributed training)')
-    parser.add_argument(
-        '--cfg-options',
-        nargs='+',
-        action=DictAction,
-        help='override some settings in the used config, the key-value pair '
-             'in xxx=yyy format will be merged into config file.')
-    parser.add_argument(
-        '--launcher',
-        choices=['none', 'pytorch', 'slurm', 'mpi'],
-        default='none',
-        help='job launcher')
+    group_gpus.add_argument('--gpus', type=int, help='number of gpus to use '
+                                                     '(only applicable to non-distributed training)')
+    group_gpus.add_argument('--gpu-ids', type=int, nargs='+', help='ids of gpus to use '
+                                                                   '(only applicable to non-distributed training)')
+    parser.add_argument('--cfg-options', nargs='+', action=DictAction,
+                        help='override some settings in the used config, the key-value pair '
+                             'in xxx=yyy format will be merged into config file.')
+    parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm', 'mpi'], default='none', help='job launcher')
     args = parser.parse_args()
 
     return args
@@ -108,22 +90,6 @@ def main():
         validate=(not args.no_validate),
         timestamp=timestamp,
         meta=meta)
-
-    #
-    img_path = '/opt/project/tests/data/0.2.jpg'
-    im = Image.open(osp.abspath(img_path)).convert('RGB')
-    epoch = 0
-    max_epochs = 100
-    while 1:
-        # cuda0 = torch.device('cuda:0')
-        x = np.random.randn(8, 3, 256, 192)
-        x = torch.from_numpy(x)
-        x = x.float().cuda()
-        x_out = model(x)
-
-        epoch += 1
-        if epoch >= max_epochs:
-            break
 
     pass
 
