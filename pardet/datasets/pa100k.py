@@ -34,7 +34,7 @@ class PA100K(data.Dataset):
     def __getitem__(self, index):
         imgname, gt_label, imgidx = self.img_id[index], self.label[index], self.img_idx[index]
         # imgpath = os.path.join(self.root_path, imgname)
-        imgpath = os.path.join('/opt/project/data/PA100K/data/release_data/release_data/', imgname)
+        imgpath = os.path.join('/pardet/data/PA100K/data/release_data/release_data/', imgname)
         img = Image.open(imgpath)
 
         if self.pipeline is not None:

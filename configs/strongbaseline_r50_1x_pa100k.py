@@ -20,7 +20,7 @@ test_cfg = dict(
 
 # data
 dataset_type = 'PA100K'
-data_root = '/opt/project/data/PA100K/'
+data_root = '/pardet/data/PA100K/'
 img_norm_cfg = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 train_pipeline = [
     dict(type='Resize', size=(256, 192)),
