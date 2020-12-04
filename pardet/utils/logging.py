@@ -65,6 +65,19 @@ def get_logger(name, log_file=None, log_level=logging.INFO):
     return logger
 
 
+def _get_logger(name='logger', log_level='INFO'):
+    stream_handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    stream_handler.setFormatter(formatter)
+    stream_handler.setLevel(log_level)
+
+    logger = logging.getLogger(name)
+    logger.addHandler(stream_handler)
+    logger.setLevel(log_level)
+
+    return logger
+
+
 def print_log(msg, logger=None, level=logging.INFO):
     """Print a log message.
 

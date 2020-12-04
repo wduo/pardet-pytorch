@@ -1,4 +1,3 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 from pardet.utils import Registry
 
 HOOKS = Registry('hook')

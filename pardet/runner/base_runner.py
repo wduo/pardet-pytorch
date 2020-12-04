@@ -1,4 +1,3 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 import os
 import time
 import os.path as osp

@@ -1,7 +1,5 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 import os
 
-# from ..dist_utils import master_only
 from .hook import HOOKS, Hook
 
 
@@ -40,7 +38,6 @@ class CheckpointHook(Hook):
         self.max_keep_ckpts = max_keep_ckpts
         self.args = kwargs
 
-    # @master_only
     def after_train_epoch(self, runner):
         if not self.by_epoch or not self.every_n_epochs(runner, self.interval):
             return
@@ -63,7 +60,6 @@ class CheckpointHook(Hook):
                 else:
                     break
 
-    # @master_only
     def after_train_iter(self, runner):
         if self.by_epoch or not self.every_n_iters(runner, self.interval):
             return

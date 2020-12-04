@@ -12,7 +12,7 @@ from pardet.apis import set_random_seed, train_detector
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('--config', help='train config file path', default='../configs/strongbaseline.py')
+    parser.add_argument('--config', help='train config file path', default='../configs/strongbaseline_r50_1x_pa100k.py')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument('--no-validate', action='store_true',
                         help='whether not to evaluate the checkpoint during training')
@@ -24,7 +24,6 @@ def parse_args():
     parser.add_argument('--cfg-options', nargs='+', action=DictAction,
                         help='override some settings in the used config, the key-value pair '
                              'in xxx=yyy format will be merged into config file.')
-    parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm', 'mpi'], default='none', help='job launcher')
     args = parser.parse_args()
 
     return args
@@ -53,13 +52,6 @@ def main():
     log_file = osp.join(cfg.work_dir, f'{timestamp}.log')
     logger = get_root_logger(log_file=log_file, log_level=cfg.log_level)
 
-    # init distributed env first, since logger depends on the dist info.
-    if args.launcher == 'none':
-        distributed = False
-    else:
-        distributed = True
-        # init_dist(args.launcher, **cfg.dist_params)
-
     # init the meta dict to record some important information such as
     # environment info and seed, which will be logged
     meta = dict()
@@ -72,7 +64,6 @@ def main():
     meta['env_info'] = env_info
     meta['config'] = cfg.pretty_text
     # log some basic info
-    logger.info(f'Distributed training: {distributed}')
     logger.info(f'Config:\n{cfg.pretty_text}')
 
     # model
@@ -86,12 +77,9 @@ def main():
         model,
         datasets,
         cfg,
-        distributed=distributed,
         validate=(not args.no_validate),
         timestamp=timestamp,
         meta=meta)
-
-    pass
 
 
 if __name__ == '__main__':

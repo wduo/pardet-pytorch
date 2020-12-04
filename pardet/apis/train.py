@@ -29,7 +29,6 @@ def set_random_seed(seed, deterministic=False):
 def train_detector(model,
                    dataset,
                    cfg,
-                   distributed=False,
                    validate=False,
                    timestamp=None,
                    meta=None):
