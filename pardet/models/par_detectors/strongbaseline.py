@@ -46,38 +46,37 @@ class StrongBaseline(nn.Module):
         x = self.backbone(img)
         return x
 
-    def forward_train(self, x):
-        feat_map = self.extract_feat(x[0].cuda())
+    def forward_train(self, **kwargs):
+        feat_map = self.extract_feat(kwargs['img'].cuda())
         logits = self.classifier(feat_map)
 
         losses = dict()
-        loss = self.loss(logits, x[1].cuda())
+        loss = self.loss(logits, kwargs['gt_label'].cuda())
         losses.update(loss)
 
         return losses
 
-    def forward_test(self, x):
+    def forward_test(self, **kwargs):
         pass
 
-    def forward(self, x, return_loss=True):
+    def forward(self, return_loss=True, **kwargs):
         if return_loss:
-            return self.forward_train(x)
+            return self.forward_train(**kwargs)
         else:
-            return self.forward_test(x)
+            return self.forward_test(**kwargs)
 
     def train_step(self, data, optimizer):
-        # losses = self(**data)
-        losses = self(data)
+        losses = self(**data)
         loss, log_vars = self._parse_losses(losses)
         outputs = dict(
-            loss=loss, log_vars=log_vars, num_samples=len(data[-1]))
+            loss=loss, log_vars=log_vars, num_samples=len(data['img_name']))
         return outputs
 
     def val_step(self, data, optimizer):
         losses = self(**data)
         loss, log_vars = self._parse_losses(losses)
         outputs = dict(
-            loss=loss, log_vars=log_vars, num_samples=len(data['img_metas']))
+            loss=loss, log_vars=log_vars, num_samples=len(data['img_name']))
         return outputs
 
     def _parse_losses(self, losses):

@@ -4,7 +4,8 @@ import os.path as osp
 
 import os
 import sys
-sys.path.insert(0, os.getcwd())
+
+sys.path.insert(0, osp.join('..', os.getcwd()))
 
 from pardet.models import build_parnet
 from pardet.datasets import build_dataset
@@ -16,7 +17,7 @@ from pardet.apis import set_random_seed, train_detector
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('config', help='train config file path', default='../configs/strongbaseline_r50_1x_pa100k.py')
+    parser.add_argument('config', help='train config file path', default='./configs/strongbaseline_r50_1x_pa100k.py')
     parser.add_argument('--work-dir', help='the dir to save logs and models')
     parser.add_argument('--no-validate', action='store_true',
                         help='whether not to evaluate the checkpoint during training')

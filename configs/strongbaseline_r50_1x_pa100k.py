@@ -41,8 +41,8 @@ test_pipeline = [
     dict(type='Normalize', **img_norm_cfg),
 ]
 data = dict(
-    batchsize=2,
-    workers=2,
+    batchsize=64,
+    workers=8,
     shuffle=True,
     train=dict(
         type=dataset_type,
@@ -68,8 +68,20 @@ data = dict(
 evaluation = dict(interval=1, metric='bbox')
 
 # optimizer
-optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
-optimizer_config = dict(grad_clip=None)
+optimizer = dict(
+    type='SGD', lr=0.01, momentum=0.9, weight_decay=5e-4,
+    constructor='DefaultOptimizerConstructor',
+    paramwise_cfg=dict(
+        custom_keys={
+            '.backbone': dict(lr_mult=1),
+            '.classifier': dict(lr_mult=10)
+        }
+    )
+)
+optimizer_config = dict(
+    grad_clip=dict(
+        max_norm=10.0)
+)
 # learning policy
 lr_config = dict(
     policy='step',
@@ -94,4 +106,3 @@ log_level = 'INFO'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
-

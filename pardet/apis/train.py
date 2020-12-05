@@ -5,7 +5,7 @@ import torch
 
 from pardet.datasets import build_dataloader
 from pardet.utils import get_root_logger
-from pardet.runner import Runner
+from pardet.runner import Runner, build_optimizer
 
 
 def set_random_seed(seed, deterministic=False):
@@ -45,8 +45,7 @@ def train_detector(model,
     ]
 
     # build runner
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.02, momentum=0.9, weight_decay=0.0001)
-    optimizer_config = cfg.optimizer_config
+    optimizer = build_optimizer(model, cfg.optimizer)
     runner = Runner(
         model,
         optimizer=optimizer,
@@ -56,6 +55,7 @@ def train_detector(model,
     runner.timestamp = timestamp
 
     # register hooks
+    optimizer_config = cfg.optimizer_config
     runner.register_training_hooks(cfg.lr_config, optimizer_config,
                                    cfg.checkpoint_config, cfg.log_config,
                                    cfg.get('momentum_config', None))

@@ -86,7 +86,7 @@ class LrUpdaterHook(Hook):
             k = (1 - cur_iters / self.warmup_iters) * (1 - self.warmup_ratio)
             warmup_lr = [_lr * (1 - k) for _lr in self.regular_lr]
         elif self.warmup == 'exp':
-            k = self.warmup_ratio**(1 - cur_iters / self.warmup_iters)
+            k = self.warmup_ratio ** (1 - cur_iters / self.warmup_iters)
             warmup_lr = [_lr * k for _lr in self.regular_lr]
         return warmup_lr
 
@@ -150,6 +150,17 @@ class FixedLrUpdaterHook(LrUpdaterHook):
 
 
 @HOOKS.register_module()
+class ReduceLROnPlateauUpdaterHook(LrUpdaterHook):
+    # Todo:
+    # from torch.optim.lr_scheduler import ReduceLROnPlateau
+    def __init__(self, **kwargs):
+        super(ReduceLROnPlateauUpdaterHook, self).__init__(**kwargs)
+
+    def get_lr(self, runner, base_lr):
+        return base_lr
+
+
+@HOOKS.register_module()
 class StepLrUpdaterHook(LrUpdaterHook):
 
     def __init__(self, step, gamma=0.1, **kwargs):
@@ -169,14 +180,14 @@ class StepLrUpdaterHook(LrUpdaterHook):
         progress = runner.epoch if self.by_epoch else runner.iter
 
         if isinstance(self.step, int):
-            return base_lr * (self.gamma**(progress // self.step))
+            return base_lr * (self.gamma ** (progress // self.step))
 
         exp = len(self.step)
         for i, s in enumerate(self.step):
             if progress < s:
                 exp = i
                 break
-        return base_lr * self.gamma**exp
+        return base_lr * self.gamma ** exp
 
 
 @HOOKS.register_module()
@@ -188,7 +199,7 @@ class ExpLrUpdaterHook(LrUpdaterHook):
 
     def get_lr(self, runner, base_lr):
         progress = runner.epoch if self.by_epoch else runner.iter
-        return base_lr * self.gamma**progress
+        return base_lr * self.gamma ** progress
 
 
 @HOOKS.register_module()
@@ -206,7 +217,7 @@ class PolyLrUpdaterHook(LrUpdaterHook):
         else:
             progress = runner.iter
             max_progress = runner.max_iters
-        coeff = (1 - progress / max_progress)**self.power
+        coeff = (1 - progress / max_progress) ** self.power
         return (base_lr - self.min_lr) * coeff + self.min_lr
 
 
@@ -220,7 +231,7 @@ class InvLrUpdaterHook(LrUpdaterHook):
 
     def get_lr(self, runner, base_lr):
         progress = runner.epoch if self.by_epoch else runner.iter
-        return base_lr * (1 + self.gamma * progress)**(-self.power)
+        return base_lr * (1 + self.gamma * progress) ** (-self.power)
 
 
 @HOOKS.register_module()

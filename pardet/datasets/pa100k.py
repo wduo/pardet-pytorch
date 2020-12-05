@@ -23,7 +23,7 @@ class PA100K(data.Dataset):
         self.img_prefix = img_prefix
         self.attr_id = dataset_info.attr_name
         self.attr_num = len(self.attr_id)
-        self.img_idx = dataset_info.partition[split]
+        self.img_idx = dataset_info.partition[split][:1024]
 
         if isinstance(self.img_idx, list):
             self.img_idx = self.img_idx[0]  # default partition 0
@@ -32,9 +32,9 @@ class PA100K(data.Dataset):
         self.label = attr_label[self.img_idx]
 
     def __getitem__(self, index):
-        imgname, gt_label, imgidx = self.img_id[index], self.label[index], self.img_idx[index]
-        imgpath = os.path.join(self.img_prefix, imgname)
-        img = Image.open(imgpath)
+        img_name, gt_label, img_idx = self.img_id[index], self.label[index], self.img_idx[index]
+        img_path = os.path.join(self.img_prefix, img_name)
+        img = Image.open(img_path)
 
         if self.pipeline is not None:
             img = self.pipeline(img)
@@ -42,7 +42,8 @@ class PA100K(data.Dataset):
         if self.target_transform is not None:
             gt_label = self.pipeline(gt_label)
 
-        return img, gt_label, imgname
+        data_item = dict(img=img, gt_label=gt_label, img_name=img_name)
+        return data_item
 
     def __len__(self):
         return len(self.img_id)
