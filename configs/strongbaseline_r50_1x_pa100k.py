@@ -4,11 +4,16 @@ model = dict(
     backbone=dict(
         type='ResNet50',
         layers=(3, 4, 6, 3),
-        pretrained=False,
+        pretrained=True,
     ),
     classifier=dict(
         type='BaseClassifier',
-        nattr=113,
+        nattr=26,
+    ),
+    loss=dict(
+        type='CEL_Sigmoid',
+        sample_weight=None,
+        size_average=True
     ),
 )
 train_cfg = dict(
@@ -20,7 +25,7 @@ test_cfg = dict(
 
 # data
 dataset_type = 'PA100K'
-data_root = '/pardet/data/PA100K/'
+data_root = '/pardet-pytorch/data/PA100K/'
 img_norm_cfg = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 train_pipeline = [
     dict(type='Resize', size=(256, 192)),
@@ -43,7 +48,7 @@ data = dict(
         type=dataset_type,
         split='train',
         ann_file=data_root + 'annotation/dataset.pkl',
-        img_prefix=data_root + 'data/release_data/',
+        img_prefix=data_root + 'data/release_data/release_data/',
         pipeline=train_pipeline
     ),
     val=dict(
@@ -74,13 +79,14 @@ lr_config = dict(
     step=[8, 11])
 total_epochs = 12
 
-# logs and ckpts
+# logs
 log_config = dict(
     interval=50,
     hooks=[
         dict(type='TextLoggerHook'),
-        # dict(type='TensorboardLoggerHook')
+        dict(type='TensorboardLoggerHook')
     ])
+# ckpts
 checkpoint_config = dict(interval=1)
 
 # misc

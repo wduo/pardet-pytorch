@@ -1,16 +1,14 @@
-import os
 import os.path as osp
-import pkgutil
-import time
-import warnings
 from collections import OrderedDict
-from importlib import import_module
 
 import torch
 from torch.optim import Optimizer
 
 
 def load_state_dict(module, state_dict, strict=False, logger=None):
+    unexpected_keys = []
+    all_missing_keys = []
+    err_msg = []
 
     metadata = getattr(state_dict, '_metadata', None)
     state_dict = state_dict.copy()
@@ -30,6 +28,29 @@ def load_state_dict(module, state_dict, strict=False, logger=None):
 
     load(module)
     load = None  # break load->load reference cycle
+
+    # ignore "num_batches_tracked" of BN layers
+    missing_keys = [
+        key for key in all_missing_keys if 'num_batches_tracked' not in key
+    ]
+
+    if unexpected_keys:
+        err_msg.append('unexpected key in source '
+                       f'state_dict: {", ".join(unexpected_keys)}\n')
+    if missing_keys:
+        err_msg.append(
+            f'missing keys in source state_dict: {", ".join(missing_keys)}\n')
+
+    if len(err_msg) > 0:
+        err_msg.insert(
+            0, 'The model and loaded state dict do not match exactly\n')
+        err_msg = '\n'.join(err_msg)
+        if strict:
+            raise RuntimeError(err_msg)
+        elif logger is not None:
+            logger.warning(err_msg)
+        else:
+            print(err_msg)
 
 
 def _load_checkpoint(filename, map_location=None):

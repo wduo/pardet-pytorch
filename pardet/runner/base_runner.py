@@ -19,7 +19,8 @@ class BaseRunner(metaclass=ABCMeta):
                  work_dir=None,
                  logger=None,
                  meta=None,
-                 max_epochs=None):
+                 max_epochs=None,
+                 max_iters=None):
 
         self.model = model
         self.optimizer = optimizer
@@ -48,6 +49,7 @@ class BaseRunner(metaclass=ABCMeta):
         self._iter = 0
         self._inner_iter = 0
         self._max_epochs = max_epochs
+        self._max_iters = max_iters
         # TODO: Redesign LogBuffer, it is not flexible and elegant enough
         self.log_buffer = LogBuffer()
 
@@ -80,6 +82,11 @@ class BaseRunner(metaclass=ABCMeta):
     def max_epochs(self):
         """int: Maximum training epochs."""
         return self._max_epochs
+
+    @property
+    def max_iters(self):
+        """int: Maximum training iterations."""
+        return self._max_iters
 
     @abstractmethod
     def train(self):

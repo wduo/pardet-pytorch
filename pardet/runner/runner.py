@@ -1,8 +1,8 @@
+import os
 import os.path as osp
 import platform
 import shutil
 import time
-import warnings
 
 import torch
 
@@ -147,6 +147,8 @@ class Runner(BaseRunner):
         if create_symlink:
             dst_file = osp.join(out_dir, 'latest.pth')
             if platform.system() != 'Windows':
-                mmcv.symlink(filename, dst_file)
+                if os.path.lexists(dst_file):
+                    os.remove(dst_file)
+                os.symlink(filename, dst_file)
             else:
                 shutil.copy(filename, dst_file)

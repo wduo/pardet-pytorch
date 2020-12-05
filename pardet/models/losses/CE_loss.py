@@ -39,5 +39,6 @@ class CEL_Sigmoid(nn.Module):
             loss = (loss * weight.cuda())
 
         loss = loss.sum() / batch_size if self.size_average else loss.sum()
+        loss = dict(CEL_Sigmoid_loss=loss)
 
         return loss

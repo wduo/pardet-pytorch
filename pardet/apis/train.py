@@ -53,7 +53,6 @@ def train_detector(model,
         work_dir=cfg.work_dir,
         logger=logger,
         meta=meta)
-    # an ugly workaround to make .log and .log.json filenames the same
     runner.timestamp = timestamp
 
     # register hooks

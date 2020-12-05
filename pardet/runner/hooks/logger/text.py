@@ -54,8 +54,6 @@ class TextLoggerHook(LoggerHook):
         mem_mb = torch.tensor([mem / (1024 * 1024)],
                               dtype=torch.int,
                               device=device)
-        if runner.world_size > 1:
-            dist.reduce(mem_mb, 0, op=dist.ReduceOp.MAX)
         return mem_mb.item()
 
     def _log_info(self, log_dict, runner):

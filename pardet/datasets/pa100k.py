@@ -20,7 +20,7 @@ class PA100K(data.Dataset):
         self.dataset = 'PA100k'
         self.pipeline = Compose(pipeline)
         self.target_transform = target_transform
-        self.root_path = dataset_info.root
+        self.img_prefix = img_prefix
         self.attr_id = dataset_info.attr_name
         self.attr_num = len(self.attr_id)
         self.img_idx = dataset_info.partition[split]
@@ -33,8 +33,7 @@ class PA100K(data.Dataset):
 
     def __getitem__(self, index):
         imgname, gt_label, imgidx = self.img_id[index], self.label[index], self.img_idx[index]
-        # imgpath = os.path.join(self.root_path, imgname)
-        imgpath = os.path.join('/pardet/data/PA100K/data/release_data/release_data/', imgname)
+        imgpath = os.path.join(self.img_prefix, imgname)
         img = Image.open(imgpath)
 
         if self.pipeline is not None:

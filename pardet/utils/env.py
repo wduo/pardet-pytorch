@@ -8,7 +8,6 @@ from collections import defaultdict
 # import cv2
 import torch
 
-# import mmcv
 from .parrots_wrapper import get_build_config
 
 
