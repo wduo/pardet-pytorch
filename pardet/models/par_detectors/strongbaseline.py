@@ -51,13 +51,10 @@ class StrongBaseline(nn.Module):
         logits = self.classifier(feat_map)
 
         losses = dict()
-        loss = self.loss(logits, kwargs['gt_label'].cuda())
+        loss = self.loss(logits, kwargs['gt_label'].cuda(), kwargs['weights'])
         losses.update(loss)
 
         return losses
-
-    def forward_test(self, **kwargs):
-        pass
 
     def forward(self, return_loss=True, **kwargs):
         if return_loss:
@@ -65,15 +62,15 @@ class StrongBaseline(nn.Module):
         else:
             return self.forward_test(**kwargs)
 
-    def train_step(self, data, optimizer):
-        losses = self(**data)
+    def train_step(self, data, optimizer, **kwargs):
+        losses = self(**data, **kwargs)
         loss, log_vars = self._parse_losses(losses)
         outputs = dict(
             loss=loss, log_vars=log_vars, num_samples=len(data['img_name']))
         return outputs
 
-    def val_step(self, data, optimizer):
-        losses = self(**data)
+    def val_step(self, data, optimizer, **kwargs):
+        losses = self(**data, **kwargs)
         loss, log_vars = self._parse_losses(losses)
         outputs = dict(
             loss=loss, log_vars=log_vars, num_samples=len(data['img_name']))
@@ -96,3 +93,24 @@ class StrongBaseline(nn.Module):
             log_vars[loss_name] = loss_value.item()
 
         return loss, log_vars
+
+    def forward_test(self, **kwargs):
+        imgs = kwargs.pop('img')
+        num_augs = len(imgs)
+        if num_augs == 1:
+            return self.simple_test(imgs, **kwargs)
+        else:
+            return self.aug_test(imgs, **kwargs)
+
+    def simple_test(self, img, **kwargs):
+        feat_map = self.extract_feat(img.cuda())
+        logit = self.classifier(feat_map)
+        prob = torch.sigmoid(logit).detach().cpu().numpy()
+
+        gt_label = kwargs['gt_label'].detach().cpu().numpy()
+        result = dict(prob=prob, gt_label=gt_label)
+        return result
+
+    def aug_test(self, imgs, **kwargs):
+        # TODO: support test augmentation for predefined proposals
+        pass

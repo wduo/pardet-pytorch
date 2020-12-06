@@ -19,8 +19,8 @@ class EvalHook(Hook):
 
     def __init__(self, dataloader, start=None, interval=1, **eval_kwargs):
         self.dataloader = dataloader
-        self.interval = interval
         self.start = start
+        self.interval = interval
         self.eval_kwargs = eval_kwargs
         self.initial_epoch_flag = True
 
@@ -54,9 +54,12 @@ class EvalHook(Hook):
     def after_train_epoch(self, runner):
         if not self.evaluation_flag(runner):
             return
-        from mmdet.apis import single_gpu_test
-        results = single_gpu_test(runner.model, self.dataloader, show=False)
+        from pardet.apis import single_gpu_test
+        results = single_gpu_test(runner.model, self.dataloader)
+        # mode = runner.mode
+        runner.mode = 'test'
         self.evaluate(runner, results)
+        # runner.mode = mode
 
     def evaluate(self, runner, results):
         eval_res = self.dataloader.dataset.evaluate(

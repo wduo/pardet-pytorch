@@ -143,13 +143,16 @@ class TextLoggerHook(LoggerHook):
             log_dict['mode'] = 'train' if 'time' in runner.log_buffer.output \
                 else 'val'
             log_dict['epoch'] = runner.epoch + 1
+        elif runner.mode == 'test':
+            log_dict['mode'] = 'test'
+            log_dict['epoch'] = runner.epoch + 1
         elif runner.mode == 'val':
             # normal val mode
             # runner.epoch += 1 has been done before val workflow
             log_dict['mode'] = 'val'
             log_dict['epoch'] = runner.epoch
         else:
-            raise ValueError(f"runner mode should be 'train' or 'val', "
+            raise ValueError(f"runner mode should be 'train', 'val' or 'test', "
                              f'but got {runner.mode}')
 
         if self.by_epoch:

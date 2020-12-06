@@ -89,11 +89,11 @@ class BaseRunner(metaclass=ABCMeta):
         return self._max_iters
 
     @abstractmethod
-    def train(self):
+    def train(self, **kwargs):
         pass
 
     @abstractmethod
-    def val(self):
+    def val(self, **kwargs):
         pass
 
     @abstractmethod

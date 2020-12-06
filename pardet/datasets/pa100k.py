@@ -2,6 +2,7 @@ import os
 import pickle
 import numpy as np
 from PIL import Image
+from easydict import EasyDict
 
 import torch.utils.data as data
 
@@ -23,6 +24,8 @@ class PA100K(data.Dataset):
         self.pipeline = Compose(pipeline)
         self.target_transform = target_transform
 
+        self._img_idx = [ii for ii in range(len(self.image_names))]
+
     def __getitem__(self, idx):
         img_name, label = self.image_names[idx], self.labels[idx]
         img_path = os.path.join(self.img_prefix, img_name)
@@ -38,4 +41,62 @@ class PA100K(data.Dataset):
         return data_item
 
     def __len__(self):
-        return len(self.image_names)
+        return len(self._img_idx)
+
+    def evaluate(self, results, logger, threshold=0.5, metrics='ma'):
+        """Evaluation in PAR protocol."""
+        probs, gt_labels = results["probs"], results["gt_labels"],
+        pred_labels = np.array(probs) > threshold
+        gt_labels = np.array(gt_labels)
+
+        eps = 1e-20
+        result = EasyDict()
+
+        # label metrics
+        gt_pos = np.sum((gt_labels == 1), axis=0).astype(float)  # TP + FN
+        gt_neg = np.sum((gt_labels == 0), axis=0).astype(float)  # TN + FP
+        true_pos = np.sum((gt_labels == 1) * (pred_labels == 1), axis=0).astype(float)  # TP
+        true_neg = np.sum((gt_labels == 0) * (pred_labels == 0), axis=0).astype(float)  # TN
+        false_pos = np.sum(((gt_labels == 0) * (pred_labels == 1)), axis=0).astype(float)  # FP
+        false_neg = np.sum(((gt_labels == 1) * (pred_labels == 0)), axis=0).astype(float)  # FN
+        label_pos_recall = 1.0 * true_pos / (gt_pos + eps)  # true positive
+        label_neg_recall = 1.0 * true_neg / (gt_neg + eps)  # true negative
+        label_ma = (label_pos_recall + label_neg_recall) / 2  # mean accuracy
+
+        result.label_pos_recall = label_pos_recall
+        result.label_neg_recall = label_neg_recall
+        result.label_prec = true_pos / (true_pos + false_pos + eps)
+        result.label_acc = true_pos / (true_pos + false_pos + false_neg + eps)
+        result.label_f1 = 2 * result.label_prec * result.label_pos_recall / (
+                result.label_prec + result.label_pos_recall + eps)
+
+        result.label_ma = label_ma
+        result.ma = np.mean(label_ma)
+
+        # instance metrics
+        gt_pos = np.sum((gt_labels == 1), axis=1).astype(float)
+        true_pos = np.sum((pred_labels == 1), axis=1).astype(float)
+        intersect_pos = np.sum((gt_labels == 1) * (pred_labels == 1), axis=1).astype(float)  # true positive
+        union_pos = np.sum(((gt_labels == 1) + (pred_labels == 1)), axis=1).astype(float)  # IOU
+
+        instance_acc = intersect_pos / (union_pos + eps)
+        instance_prec = intersect_pos / (true_pos + eps)
+        instance_recall = intersect_pos / (gt_pos + eps)
+        instance_f1 = 2 * instance_prec * instance_recall / (instance_prec + instance_recall + eps)
+
+        instance_acc = np.mean(instance_acc)
+        instance_prec = np.mean(instance_prec)
+        instance_recall = np.mean(instance_recall)
+        instance_f1 = np.mean(instance_f1)
+
+        result.acc = instance_acc
+        result.prec = instance_prec
+        result.rec = instance_recall
+        result.f1 = instance_f1
+        result.error_num, result.fn_num, result.fp_num = false_pos + false_neg, false_neg, false_pos
+
+        eval_res = dict()
+        for metric in metrics:
+            eval_res[metric] = result[metric]
+
+        return eval_res

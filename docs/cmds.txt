@@ -5,15 +5,15 @@
 cd /home/wd/www/pardet-pytorch/
 sudo docker build -t wduo/pardet-pytorch:v0.1 docker/
 
-# test
+# test env
 sudo docker run --gpus all -it --rm wduo/pardet-pytorch:v0.1 bash
 
 ```
 
 
-# Data
-```
 
+# Data
+```python3
 python tools/convert_datasets/pa100k.py
 
 ```
@@ -39,6 +39,19 @@ sudo docker run -it --rm --shm-size=8g --net host \
 
 
 
+# Listen
+```
+WORK_DIRS=/disk2/wd/www/pardet-pytorch/work_dirs/
+
+sudo docker run -it --rm --net host --name pardet_pa100k_listen \
+  -v ${WORK_DIRS}:/work_dirs/ \
+  wduo/pardet-pytorch:v0.1 \
+  nohup tensorboard --logdir /work_dirs/strongbaseline_r50_1x_pa100k/tf_logs/ --host 10.10.9.222 --port 6008 &
+
+```
+
+
+
 
 # Test
 ```
@@ -49,20 +62,10 @@ sudo docker run -it --rm --shm-size=8g --net host \
 
 
 
-
-
-
-
 # Demo
 ```
 
 
 ```
-
-
-
-
-
-
 
 

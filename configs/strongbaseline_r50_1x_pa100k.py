@@ -12,7 +12,7 @@ model = dict(
     ),
     loss=dict(
         type='CEL_Sigmoid',
-        sample_weight=None,
+        use_sample_weight=True,
         size_average=True
     ),
 )
@@ -36,7 +36,7 @@ train_pipeline = [
     dict(type='Normalize', **img_norm_cfg),
 ]
 test_pipeline = [
-    dict(type='Resize', size=(256, 192), keep_ratio=True),
+    dict(type='Resize', size=(256, 192)),
     dict(type='ToTensor'),
     dict(type='Normalize', **img_norm_cfg),
 ]
@@ -63,7 +63,7 @@ data = dict(
         pipeline=test_pipeline
     )
 )
-evaluation = dict(interval=1, metric='mA')
+evaluation = dict(interval=1, metrics=['ma', 'acc', 'prec', 'rec', 'f1'])
 
 # optimizer
 optimizer = dict(
