@@ -1,6 +1,6 @@
 # model
 model = dict(
-    type='StrongBaseline',
+    type='DeepMAR',
     backbone=dict(
         type='ResNet50',
         layers=(3, 4, 6, 3),
@@ -46,19 +46,22 @@ data = dict(
     shuffle=True,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotation/PA100k_train_split.pkl',
+        split='train',
+        ann_file=data_root + 'annotation/train.pkl',
         img_prefix=data_root + 'data/release_data/release_data/',
         pipeline=train_pipeline
     ),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotation/PA100k_val_split.pkl',
+        split='val',
+        ann_file=data_root + 'annotations/val.pkl',
         img_prefix=data_root + 'data/release_data/release_data/',
         pipeline=train_pipeline
     ),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotation/PA100k_test_split.pkl',
+        split='test',
+        ann_file=data_root + 'annotations/test.pkl',
         img_prefix=data_root + 'data/release_data/release_data/',
         pipeline=test_pipeline
     )

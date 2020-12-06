@@ -1,35 +1,15 @@
-import random
-import numpy as np
-
-import torch
-
-from pardet.datasets import build_dataloader
+# Copyright (c) 2020, All rights reserved.
+# Author: wduo, wduo@163.com
+# pardet-pytorch for Pedestrian Attribute Recognition.
 from pardet.utils import get_root_logger
-from pardet.runner import Runner, build_optimizer
-
-
-def set_random_seed(seed, deterministic=False):
-    """Set random seed.
-    Args:
-        seed (int): Seed to be used.
-        deterministic (bool): Whether to set the deterministic option for
-            CUDNN backend, i.e., set `torch.backends.cudnn.deterministic`
-            to True and `torch.backends.cudnn.benchmark` to False.
-            Default: False.
-    """
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    if deterministic:
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+from pardet.datasets import build_dataset, build_dataloader
+from pardet.runner import build_optimizer, Runner, EvalHook
 
 
 def train_detector(model,
                    dataset,
                    cfg,
-                   validate=False,
+                   evaluate=False,
                    timestamp=None,
                    meta=None):
     logger = get_root_logger(cfg.log_level)
@@ -59,6 +39,14 @@ def train_detector(model,
     runner.register_training_hooks(cfg.lr_config, optimizer_config,
                                    cfg.checkpoint_config, cfg.log_config,
                                    cfg.get('momentum_config', None))
+
+    # register eval hooks
+    if evaluate:
+        test_dataset = build_dataset(cfg.data.test)
+        test_dataloader = build_dataloader(dataset=test_dataset, batch_size=1,
+                                           num_workers=cfg.data.workers, shuffle=False)
+        eval_cfg = cfg.get('evaluation', {})
+        runner.register_hook(EvalHook(test_dataloader, **eval_cfg))
 
     if cfg.resume_from:
         runner.resume(cfg.resume_from)

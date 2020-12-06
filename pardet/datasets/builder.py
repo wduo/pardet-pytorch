@@ -1,7 +1,6 @@
-from torch import nn
 from torch.utils.data import DataLoader
 
-from pardet.utils import Registry, build_from_cfg
+from pardet.utils import Registry, build
 
 DATASETS = Registry('DATASETS')
 PIPELINES = Registry('PIPELINES')
@@ -17,34 +16,12 @@ def build_pipeline(cfg):
     return build(cfg, PIPELINES)
 
 
-def build_dataloader(train_set, batchsize, workers, shuffle=True):
+def build_dataloader(dataset, batch_size, num_workers, shuffle=True):
     data_loader = DataLoader(
-        dataset=train_set,
-        batch_size=batchsize,
-        num_workers=workers,
+        dataset=dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
         shuffle=shuffle,
         pin_memory=True,
     )
     return data_loader
-
-
-def build(cfg, registry, default_args=None):
-    """Build a module.
-
-    Args:
-        cfg (dict, list[dict]): The config of modules, is is either a dict
-            or a list of configs.
-        registry (:obj:`Registry`): A registry the module belongs to.
-        default_args (dict, optional): Default arguments to build the module.
-            Defaults to None.
-
-    Returns:
-        nn.Module: A built nn module.
-    """
-    if isinstance(cfg, list):
-        modules = [
-            build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
-        ]
-        return nn.Sequential(*modules)
-    else:
-        return build_from_cfg(cfg, registry, default_args)

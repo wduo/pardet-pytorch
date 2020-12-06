@@ -1,4 +1,3 @@
-# Copyright (c) Open-MMLab. All rights reserved.
 import ast
 import os.path as osp
 import platform
@@ -12,7 +11,7 @@ from importlib import import_module
 from addict import Dict
 from yapf.yapflib.yapf_api import FormatCode
 
-from .path import check_file_exist
+from .misc import check_file_exist
 
 if platform.system() == 'Windows':
     import regex as re

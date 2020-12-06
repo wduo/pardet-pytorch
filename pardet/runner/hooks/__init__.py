@@ -6,3 +6,4 @@ from .optimizer import OptimizerHook
 from .checkpoint import CheckpointHook
 from .iter_timer import IterTimerHook
 from .logger import TextLoggerHook, TensorboardLoggerHook
+from .eval_hooks import EvalHook

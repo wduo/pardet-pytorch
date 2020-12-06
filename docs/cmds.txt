@@ -28,12 +28,12 @@ DATA_DIR=/disk2/wd/www/pardet-pytorch/data/
 WORK_DIRS=/disk2/wd/www/pardet-pytorch/work_dirs/
 
 sudo docker run -it --rm --shm-size=8g --net host \
-  --gpus device=1 -w /pardet-pytorch/ --name pardet_pa100k \
+  --gpus device=1 --name pardet_pa100k \
   -v ${PRETRAIN}:/root/.cache/torch/checkpoints/ \
   -v ${KERNEL_DIR}:/pardet-pytorch/ \
   -v ${DATA_DIR}:/pardet-pytorch/data/ \
   -v ${WORK_DIRS}:/pardet-pytorch/work_dirs/ \
-  wduo/pardet-pytorch:v0.1 python /pardet-pytorch/tools/train.py ./configs/strongbaseline_r50_1x_pa100k.py
+  wduo/pardet-pytorch:v0.1 python tools/train.py ./configs/strongbaseline_r50_1x_pa100k.py
 
 ```
 

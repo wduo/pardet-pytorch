@@ -2,7 +2,7 @@ import inspect
 import warnings
 from functools import partial
 
-from .misc import is_str
+from torch import nn
 
 
 class Registry:
@@ -140,7 +140,7 @@ def build_from_cfg(cfg, registry, default_args=None):
 
     args = cfg.copy()
     obj_type = args.pop('type')
-    if is_str(obj_type):
+    if isinstance(obj_type, str):
         obj_cls = registry.get(obj_type)
         if obj_cls is None:
             raise KeyError(
@@ -155,3 +155,25 @@ def build_from_cfg(cfg, registry, default_args=None):
         for name, value in default_args.items():
             args.setdefault(name, value)
     return obj_cls(**args)
+
+
+def build(cfg, registry, default_args=None):
+    """Build a module.
+
+    Args:
+        cfg (dict, list[dict]): The config of modules, is is either a dict
+            or a list of configs.
+        registry (:obj:`Registry`): A registry the module belongs to.
+        default_args (dict, optional): Default arguments to build the module.
+            Defaults to None.
+
+    Returns:
+        nn.Module: A built nn module.
+    """
+    if isinstance(cfg, list):
+        modules = [
+            build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
+        ]
+        return nn.Sequential(*modules)
+    else:
+        return build_from_cfg(cfg, registry, default_args)
