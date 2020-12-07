@@ -4,7 +4,7 @@ from .hook import HOOKS, Hook
 
 
 class LrUpdaterHook(Hook):
-    """LR Scheduler in MMCV.
+    """LR Scheduler.
 
     Args:
         by_epoch (bool): LR changes epoch by epoch
@@ -152,11 +152,15 @@ class FixedLrUpdaterHook(LrUpdaterHook):
 @HOOKS.register_module()
 class ReduceLROnPlateauUpdaterHook(LrUpdaterHook):
     # Todo:
-    # from torch.optim.lr_scheduler import ReduceLROnPlateau
+    from torch.optim.lr_scheduler import ReduceLROnPlateau
     def __init__(self, **kwargs):
         super(ReduceLROnPlateauUpdaterHook, self).__init__(**kwargs)
 
     def get_lr(self, runner, base_lr):
+
+
+
+
         return base_lr
 
 

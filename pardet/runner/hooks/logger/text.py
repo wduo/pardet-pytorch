@@ -4,7 +4,6 @@ from collections import OrderedDict
 import json
 
 import torch
-import torch.distributed as dist
 
 from ..hook import HOOKS
 from .base import LoggerHook

@@ -1,0 +1,24 @@
+
+# hooks and stages
+hooks: lr, momentum, optimizer, checkpoint, iterTimer, logger, eval
+stages:
+    before_run;
+    before_train_epoch;
+    before_train_iter;
+    after_train_iter;
+    after_train_epoch;
+    before_val_epoch;
+    before_val_iter;
+    after_val_iter;
+    after_val_epoch;
+    after_run;
+
+mapping table:
+                                          lr    momentum    optimizer    checkpoint    iterTimer    logger    eval
+before_run                                1     1                                                   1
+    before_train_epoch                    1     1                                      1            1         1
+        before_train_iter                 1     1                                      1
+        after_train_iter                                    1            1             1            1
+    after_train_epoch                                                    1                          1         1
+    after_val_epoch                                                                                 1
+after_run                                                                                           1
