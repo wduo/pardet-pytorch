@@ -1,4 +1,5 @@
-from math import cos, pi
+from math import cos, pi, inf
+import numpy as np
 
 from .hook import HOOKS, Hook
 
@@ -138,6 +139,14 @@ class LrUpdaterHook(Hook):
                 warmup_lr = self.get_warmup_lr(cur_iter)
                 self._set_lr(runner, warmup_lr)
 
+    def after_val_epoch(self, runner):
+        if hasattr(self, 'val_loss') and hasattr(self, '_step'):
+            values = np.array(runner.log_buffer.val_history["loss"][:])
+            nums = np.array(runner.log_buffer.n_history["loss"][:])
+            avg = np.sum(values * nums) / np.sum(nums)
+            self.val_loss.extend([avg])
+            self._step(runner)
+
 
 @HOOKS.register_module()
 class FixedLrUpdaterHook(LrUpdaterHook):
@@ -150,18 +159,48 @@ class FixedLrUpdaterHook(LrUpdaterHook):
 
 
 @HOOKS.register_module()
-class ReduceLROnPlateauUpdaterHook(LrUpdaterHook):
-    # Todo:
-    from torch.optim.lr_scheduler import ReduceLROnPlateau
-    def __init__(self, **kwargs):
-        super(ReduceLROnPlateauUpdaterHook, self).__init__(**kwargs)
+class ReduceLROnPlateauLrUpdaterHook(LrUpdaterHook):
+    # from torch.optim.lr_scheduler import ReduceLROnPlateau
+    def __init__(self, mode='min', gamma=0.1, patience=4, min_lr=0,
+                 threshold=1e-4, eps=1e-8, **kwargs):
+        self.mode = mode
+        self.gamma = gamma
+        self.patience = patience
+
+        self.val_loss = []
+        self.best = -inf
+        self.num_bad_epochs = None
+        self.warmup_epoch = None
+        super(ReduceLROnPlateauLrUpdaterHook, self).__init__(**kwargs)
 
     def get_lr(self, runner, base_lr):
-
-
-
-
+        epoch = runner.epoch
+        if not self.warmup_epoch:
+            epoch_len = len(runner.data_loader)
+            self.warmup_epoch = self.warmup_iters // epoch_len + 1
+        if epoch > self.patience + self.warmup_epoch:
+            if self.num_bad_epochs > self.patience:
+                self.num_bad_epochs = 0
+                return base_lr * self.gamma
         return base_lr
+
+    def _step(self, runner):
+        epoch = runner.epoch
+        if not self.warmup_epoch:
+            epoch_len = len(runner.data_loader)
+            self.warmup_epoch = self.warmup_iters // epoch_len + 1
+        if epoch <= self.patience + self.warmup_epoch:
+            self.num_bad_epochs = 0
+        elif epoch > self.patience + self.warmup_epoch:
+            current = float(self.val_loss[-1])
+            if self._is_better(current, self.best):
+                self.best = current
+                self.num_bad_epochs = 0
+            else:
+                self.num_bad_epochs += 1
+
+    def _is_better(self, a, best):
+        return a < best if self.mode == 'min' else a > best
 
 
 @HOOKS.register_module()

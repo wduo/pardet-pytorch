@@ -24,7 +24,7 @@ class PA100K(data.Dataset):
         self.pipeline = Compose(pipeline)
         self.target_transform = target_transform
 
-        self._img_idx = [ii for ii in range(len(self.image_names))]
+        self._img_idx = [ii for ii in range(len(self.image_names))]  # [:50 * 64]
 
     def __getitem__(self, idx):
         img_name, label = self.image_names[idx], self.labels[idx]
@@ -43,9 +43,9 @@ class PA100K(data.Dataset):
     def __len__(self):
         return len(self._img_idx)
 
-    def evaluate(self, results, logger, threshold=0.5, metrics='ma'):
+    def evaluate(self, results, logger, threshold=0.5, metrics=('ma', 'acc', 'prec', 'rec', 'f1')):
         """Evaluation in PAR protocol."""
-        probs, gt_labels = results["probs"], results["gt_labels"],
+        probs, gt_labels = results["probs"], results["gt_labels"]
         pred_labels = np.array(probs) > threshold
         gt_labels = np.array(gt_labels)
 

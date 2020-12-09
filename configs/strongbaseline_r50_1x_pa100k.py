@@ -83,12 +83,12 @@ optimizer_config = dict(
 )
 # learning policy
 lr_config = dict(
-    policy='step',
+    policy='ReduceLROnPlateau',
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=0.001,
-    step=[8, 11])
-total_epochs = 12
+    patience=4)
+total_epochs = 30
 
 # logs
 log_config = dict(

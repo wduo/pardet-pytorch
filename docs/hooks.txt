@@ -13,12 +13,12 @@ stages:
     after_val_epoch;
     after_run;
 
-mapping table:
+mapping table: logger priority very low
                                           lr    momentum    optimizer    checkpoint    iterTimer    logger    eval
 before_run                                1     1                                                   1
     before_train_epoch                    1     1                                      1            1         1
         before_train_iter                 1     1                                      1
         after_train_iter                                    1            1             1            1
     after_train_epoch                                                    1                          1         1
-    after_val_epoch                                                                                 1
+    after_val_epoch                       1                                                         1
 after_run                                                                                           1
