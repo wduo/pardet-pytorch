@@ -1,17 +1,16 @@
 import os
-from PIL import Image, ImageFont, ImageDraw
 import glob
 from tqdm import tqdm
+from PIL import Image, ImageFont, ImageDraw
 import pdb
-
-from mmdet.apis import init_detector, inference_detector
-import mmcv
 
 import torch
 import torchvision.transforms as T
 
-from models.base_block import FeatClassifier, BaseClassifier
-from models.resnet import resnet50
+from mmdet.apis import init_detector, inference_detector
+import mmcv
+
+from pardet.models import build_parnet
 
 
 def model_init_mmdet():
@@ -30,9 +29,7 @@ def demo_mmdet(model, img_path):
 
 def model_init_par():
     # model
-    backbone = resnet50()
-    classifier = BaseClassifier(nattr=113)
-    model = FeatClassifier(backbone, classifier)
+    model = build_parnet(cfg.model)
 
     # load
     checkpoint = torch.load('/ckpt/ckpt_max.pth', map_location='cpu')

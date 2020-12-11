@@ -86,6 +86,7 @@ def _get_logger(name='logger', log_level='INFO'):
     """Custom define"""
     stream_handler = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s[line:%(lineno)d] - %(message)s')
     stream_handler.setFormatter(formatter)
     stream_handler.setLevel(log_level)
 

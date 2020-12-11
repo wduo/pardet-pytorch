@@ -25,5 +25,6 @@ COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 RUN pip install addict yapf opencv-python
 RUN pip install future tensorboard
+RUN pip install Flask==1.1.2
 
 WORKDIR /pardet-pytorch/

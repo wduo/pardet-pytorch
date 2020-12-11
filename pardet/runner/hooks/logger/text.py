@@ -70,6 +70,9 @@ class TextLoggerHook(LoggerHook):
                 for k, val in log_dict['lr'].items():
                     lr_str.append(f'lr_{k}: {val:.3e}')
                 lr_str = ' '.join(lr_str)
+            # elif isinstance(log_dict['lr'], list):
+            #     lr_str = [f'{lr_:3e}' for lr_ in log_dict['lr']]
+            #     lr_str = 'lr: ' + ' '.join(lr_str)
             else:
                 lr_str = f'lr: {log_dict["lr"]:.3e}'
 
@@ -162,6 +165,7 @@ class TextLoggerHook(LoggerHook):
         cur_lr = runner.current_lr()
         if isinstance(cur_lr, list):
             log_dict['lr'] = cur_lr[0]
+            # log_dict['lr'] = cur_lr
         else:
             assert isinstance(cur_lr, dict)
             log_dict['lr'] = {}

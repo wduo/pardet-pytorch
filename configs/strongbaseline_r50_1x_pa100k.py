@@ -42,17 +42,17 @@ test_pipeline = [
 ]
 data = dict(
     batchsize=64,
-    workers=8,
+    workers=16,
     shuffle=True,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotation/PA100k_train_split.pkl',
+        ann_file=data_root + 'annotation/PA100k_trainval_split.pkl',
         img_prefix=data_root + 'data/release_data/release_data/',
         pipeline=train_pipeline
     ),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotation/PA100k_val_split.pkl',
+        ann_file=data_root + 'annotation/PA100k_test_split.pkl',
         img_prefix=data_root + 'data/release_data/release_data/',
         pipeline=train_pipeline
     ),
