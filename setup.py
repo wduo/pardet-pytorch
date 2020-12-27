@@ -2,12 +2,17 @@
 import os
 from setuptools import find_packages, setup
 
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+
 if __name__ == '__main__':
     setup(
         name='pardet-pytorch',
         version="v0.1",
         description='pardet-pytorch for Pedestrian Attribute Recognition.',
-        long_description="""readme()""",
+        long_description=read('README.md'),
         long_description_content_type='text/markdown',
         author='wduo',
         author_email='wduo2017@163.com',

@@ -178,6 +178,7 @@ class ReduceLROnPlateauLrUpdaterHook(LrUpdaterHook):
         self.eps = eps
 
         self.val_loss = None
+        self.lr_decay_times = None
         self._init_is_better(mode=mode, threshold=threshold,
                              threshold_mode=threshold_mode)
         self._reset()
@@ -192,9 +193,9 @@ class ReduceLROnPlateauLrUpdaterHook(LrUpdaterHook):
             old_lr = float(base_lr)
             new_lr = max(old_lr * self.factor, self.min_lr)
             if old_lr - new_lr > self.eps:
-                return base_lr * self.factor
+                self.lr_decay_times += 1
 
-        return base_lr
+        return base_lr * (self.factor ** self.lr_decay_times)
 
     def _step(self):
         current = float(self.val_loss)
@@ -233,10 +234,9 @@ class ReduceLROnPlateauLrUpdaterHook(LrUpdaterHook):
         self.threshold_mode = threshold_mode
 
     def _reset(self):
-        """Resets num_bad_epochs counter and cooldown counter."""
         self.best = self.mode_worse
-        self.cooldown_counter = 0
         self.num_bad_epochs = 0
+        self.lr_decay_times = 0
 
 
 @HOOKS.register_module()
